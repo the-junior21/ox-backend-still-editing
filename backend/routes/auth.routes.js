@@ -7,29 +7,40 @@ const router = express.Router();
 router.post("/signup", async (req, res) => {
     console.log("BODY:", req.body);
 
-  const { name, number} = req.body;
+  const { name,email,number,password} = req.body;
 
-  if (!name?.trim() || !number?.trim()) {
+  if (!name?.trim() || !email?.trim() || !number?.trim()|| !password?.trim()) {
   return res.status(400).json({ message: "Missing fields" });
 }
   try {
-   // const hashed = await bcrypt.hash(password, 10);
+    const existingEmail = await User.findOne({
+      email:email.trim().toLowerCase(),
+    })
+    if (existingEmail) {
+      return res.status(400).json({
+        message: "Email already exists",
+      });
+    }
+    if (exisitingNumber) {
+      return res.status(400).json({
+        message: "Number already exists",
+      });
+    }
+    const hashed = await bcrypt.hash(password, 10);
 
-    let user = await User.findOne( {number:number.trim()})
-      if(!user){
-        user = await User.create({
+    let user = await User.findOne( {email:email.trim()})
+     const user = await User.create({
           name:name.trim(),
+          email:email.trim(),
           number:number.trim(),
+          password:hashed,
+          role:null,
         })
-      }else{
-        user.name=name.trim()
-        await user.save()
-      }
-    
-      //email,
-      //password: hashed,
+     
+  //    email,
+    //  password: hashed;
       //role : role || null,
-    ;
+   // ;
 
     res.status(201).json({
       message: "User created",
