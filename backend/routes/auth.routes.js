@@ -21,7 +21,7 @@ router.post("/signup", async (req, res) => {
         message: "Email already exists",
       });
     }
-    if (exisitingNumber) {
+    if (existingNumber) {
       return res.status(400).json({
         message: "Number already exists",
       });
