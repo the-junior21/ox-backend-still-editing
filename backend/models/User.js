@@ -3,7 +3,9 @@ import mongoose from "mongoose";
 const UserSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    number: { type: String, required: true, unique: false },
+    password: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    number: { type: String, required: true, unique: true },
 
     role: {
       type: String,
@@ -16,22 +18,20 @@ const UserSchema = new mongoose.Schema(
       default: false,
     },
     location: {
-        lat:Number,
-        lng:Number
+      lat: Number,
+      lng: Number,
     },
-    status:{
-      type:String,
-      enum:["ON_TRIP","OFF_TRIP"],
-      default:"OFF_TRIP"
+    status: {
+      type: String,
+      enum: ["ON_TRIP", "OFF_TRIP"],
+      default: "OFF_TRIP",
     },
-    pushToken:{
-      type:String,
+    pushToken: {
+      type: String,
     },
-    oneSignalId:{type:String}
-
+    oneSignalId: { type: String },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-export default mongoose.models.User ||
-  mongoose.model("User", UserSchema);
+export default mongoose.models.User || mongoose.model("User", UserSchema);
