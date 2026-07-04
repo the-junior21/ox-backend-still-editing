@@ -60,6 +60,7 @@ router.post("/signup", async (req, res) => {
       100000 + Math.random() * 900000,
     ).toString();
     const verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
+console.log("4. Creating user");
 
     const user = await User.create({
       name: name.trim(),
@@ -71,8 +72,16 @@ router.post("/signup", async (req, res) => {
       verificationCode,
       verificationCodeExpires,
     });
+    console.log("5. User created");
+    console.log("6. Verifying SMTP");
+
+
 try {
   await transporter.verify();
+  console.log("7. SMTP verified");
+  console.log("8. Sending email");
+
+
 console.log("SMTP connected");
   await transporter.sendMail({
     from: '"OX" <no-reply@ox.com>',
@@ -88,6 +97,8 @@ console.log("SMTP connected");
       <p>This code expires in 10 minutes.</p>
     `,
   });
+  console.log("9. Email sent");
+
 
   console.log("Email sent successfully");
 } catch (mailError) {
