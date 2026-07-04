@@ -63,7 +63,7 @@ router.post("/signup", async (req, res) => {
 
     const user = await User.create({
       name: name.trim(),
-      email: email.trim().toLowerCase,
+      email: email.trim().toLowerCase(),
       number: number.trim(),
       password: hashed,
       role: null,
@@ -71,20 +71,28 @@ router.post("/signup", async (req, res) => {
       verificationCode,
       verificationCodeExpires,
     });
-    await transporter.sendMail({
-  from: '"OX" <no-reply@ox.com>',
-  to: user.email,
-  subject: "Verify your email",
-  html: `
-    <h2>Welcome to OX!</h2>
+try {
+  await transporter.verify();
+console.log("SMTP connected");
+  await transporter.sendMail({
+    from: '"OX" <no-reply@ox.com>',
+    to: user.email,
+    subject: "Verify your email",
+    html: `
+      <h2>Welcome to OX!</h2>
 
-    <p>Your verification code is:</p>
+      <p>Your verification code is:</p>
 
-    <h1>${verificationCode}</h1>
+      <h1>${verificationCode}</h1>
 
-    <p>This code expires in 10 minutes.</p>
-  `,
-});
+      <p>This code expires in 10 minutes.</p>
+    `,
+  });
+
+  console.log("Email sent successfully");
+} catch (mailError) {
+  console.error("Mail Error:", mailError);
+}
 
     res.status(201).json({
       message: "Verification code sent",
