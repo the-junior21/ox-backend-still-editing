@@ -6,7 +6,9 @@ const UserSchema = new mongoose.Schema(
     password: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     number: { type: String, required: true, unique: true },
-
+    isVerified: { type: Boolean, default: false },
+    verificationCode: { type: String, default: null },
+    verificationCodeExpires: { type: Date, default: null },
     role: {
       type: String,
       enum: ["passenger", "driver"],

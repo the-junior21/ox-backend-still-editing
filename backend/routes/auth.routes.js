@@ -55,18 +55,39 @@ router.post("/signup", async (req, res) => {
       });
     }
     const hashed = await bcrypt.hash(password, 10);
+    const verificationCode = Math.floor(
+      100000 + Math.random() * 900000,
+    ).toString();
+    const verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
 
     const user = await User.create({
       name: name.trim(),
-      email: email.trim(),
+      email: email.trim().toLowerCase,
       number: number.trim(),
       password: hashed,
       role: null,
+      isVerified: false,
+      verificationCode,
+      verificationCodeExpires,
     });
+    await transporter.sendMail({
+  from: '"OX" <no-reply@ox.com>',
+  to: user.email,
+  subject: "Verify your email",
+  html: `
+    <h2>Welcome to OX!</h2>
+
+    <p>Your verification code is:</p>
+
+    <h1>${verificationCode}</h1>
+
+    <p>This code expires in 10 minutes.</p>
+  `,
+});
 
     res.status(201).json({
-      message: "User created",
-      userId: user._id.toString(),
+      message: "Verification code sent",
+      email: user.email,
     });
   } catch (err) {
     console.error(err);
