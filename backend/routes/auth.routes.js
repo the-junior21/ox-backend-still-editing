@@ -100,6 +100,9 @@ console.log("SMTP connected");
 
 
   console.log("Email sent successfully");
+  console.log(process.env.MAILTRAP_USER);
+console.log(process.env.MAILTRAP_HOST);
+console.log(process.env.MAILTRAP_PORT);
 } catch (mailError) {
   console.error("Mail Error:", mailError);
 }
