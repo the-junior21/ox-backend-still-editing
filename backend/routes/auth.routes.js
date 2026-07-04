@@ -77,7 +77,6 @@ console.log("4. Creating user");
 
 
 try {
-  await transporter.verify();
   console.log("7. SMTP verified");
   console.log("8. Sending email");
 
