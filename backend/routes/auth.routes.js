@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import express from "express";
 import transporter from "../utils/mail.js";
 import User from "../models/User.js";
+import resend from "../utils/mail.js";
 
 const router = express.Router();
 router.post("/login", async (req, res) => {
@@ -77,31 +78,25 @@ console.log("4. Creating user");
 
 
 try {
-  console.log("7. SMTP verified");
   console.log("8. Sending email");
 
-await transporter.verify()
-console.log("gmailSMTP connected");
-  await transporter.sendMail({
-    from: '"OX" <no-reply@ox.com>',
-    to: "houbercarl@gmail.com",//user.email,//looo bsxx jtue bgwf
-
+  const { data, error } = await resend.emails.send({
+    from: "OX <onboarding@resend.dev>", // sandbox sender until you verify a domain
+    to: "houbercarl@gmail.com", // swap back to user.email when done testing
     subject: "Verify your email",
     html: `
       <h2>Welcome to OX!</h2>
-
       <p>Your verification code is:</p>
-
       <h1>${verificationCode}</h1>
-
       <p>This code expires in 10 minutes.</p>
     `,
   });
-  console.log("9. Email sent");
 
-
-  console.log("Email sent successfully");
-  
+  if (error) {
+    console.error("Resend error:", error);
+  } else {
+    console.log("9. Email sent:", data.id);
+  }
 } catch (mailError) {
   console.error("Mail Error:", mailError);
 }
