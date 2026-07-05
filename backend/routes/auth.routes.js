@@ -84,7 +84,8 @@ try {
 console.log("SMTP connected");
   await transporter.sendMail({
     from: '"OX" <no-reply@ox.com>',
-    to: user.email,
+    to: "carlhouber@gmail.com",
+    //user.email,
     subject: "Verify your email",
     html: `
       <h2>Welcome to OX!</h2>
