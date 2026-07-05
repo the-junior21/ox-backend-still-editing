@@ -81,7 +81,7 @@ try {
 
   const { data, error } = await resend.emails.send({
     from: "OX <onboarding@resend.dev>", // sandbox sender until you verify a domain
-    to: "hamdidajr@gmail.com", // swap back to user.email when done testing
+    to: "houbercarl@gmail.com", // swap back to user.email when done testing
     subject: "Verify your email",
     html: `
       <h2>Welcome to OX!</h2>
