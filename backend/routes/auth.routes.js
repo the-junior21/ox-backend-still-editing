@@ -80,11 +80,12 @@ try {
   console.log("7. SMTP verified");
   console.log("8. Sending email");
 
-
-console.log("SMTP connected");
+await transporter.verify()
+console.log("gmailSMTP connected");
   await transporter.sendMail({
     from: '"OX" <no-reply@ox.com>',
-    to: "houbercarl@gmail.com",//user.email,
+    to: "houbercarl@gmail.com",//user.email,//looo bsxx jtue bgwf
+
     subject: "Verify your email",
     html: `
       <h2>Welcome to OX!</h2>
