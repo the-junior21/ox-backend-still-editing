@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs";
 import express from "express";
-import transporter from "../utils/mail.js";
 import User from "../models/User.js";
 import resend from "../utils/mail.js";
 
@@ -81,7 +80,7 @@ try {
   console.log("8. Sending email");
 
   const { data, error } = await resend.emails.send({
-    from: "hamdidajr@gmail.com", // sandbox sender until you verify a domain
+    from: "OX <onboarding@resend.dev>", // sandbox sender until you verify a domain
     to: "hamdidajr@gmail.com", // swap back to user.email when done testing
     subject: "Verify your email",
     html: `
