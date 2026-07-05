@@ -82,7 +82,7 @@ try {
 
   const { data, error } = await resend.emails.send({
     from: "hamdidajr@gmail.com", // sandbox sender until you verify a domain
-    to: "houbercarl@gmail.com", // swap back to user.email when done testing
+    to: "hamdidajr@gmail.com", // swap back to user.email when done testing
     subject: "Verify your email",
     html: `
       <h2>Welcome to OX!</h2>
