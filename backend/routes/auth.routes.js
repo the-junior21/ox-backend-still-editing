@@ -80,7 +80,7 @@ router.post("/signup", async (req, res) => {
 
       const { data, error } = await resend.emails.send({
         from: "OX <onboarding@resend.dev>", // sandbox sender until you verify a domain
-        to: "user.email", // swap back to user.email when done testing
+        to: user.email, // swap back to user.email when done testing
         subject: "Verify your email",
         html: `
       <h2>Welcome to OX!</h2>
