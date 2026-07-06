@@ -190,8 +190,6 @@ router.post("/resend-code", async (req, res) => {
     user.verificationCode = verificationCode;
     user.verificationCodeExpires = verificationCodeExpires;
 
-    await user.save();
-
     // Send email here
     try {
       console.log("8. Sending email");
@@ -210,12 +208,17 @@ router.post("/resend-code", async (req, res) => {
 
       if (error) {
         console.error("Resend error:", error);
-      } else {
-        console.log("9. Email sent:", data.id);
+
+        return res.status(500).json({
+          message: "Failed to send verification email",
+        });
       }
+
+      console.log("9. Email sent:", data.id);
     } catch (mailError) {
       console.error("Mail Error:", mailError);
     }
+    await user.save();
 
     return res.status(200).json({
       message: "Verification code resent",
