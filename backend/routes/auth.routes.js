@@ -157,5 +157,76 @@ router.post("/verify", async (req, res) => {
     });
   }
 });
+router.post("/resend-code", async (req, res) => {
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({
+      message: "Missing userId",
+    });
+  }
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({
+        message: "Email already verified",
+      });
+    }
+
+    const verificationCode = Math.floor(
+      100000 + Math.random() * 900000,
+    ).toString();
+
+    const verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
+
+    user.verificationCode = verificationCode;
+    user.verificationCodeExpires = verificationCodeExpires;
+
+    await user.save();
+
+    // Send email here
+    try {
+      console.log("8. Sending email");
+
+      const { data, error } = await resend.emails.send({
+        from: "OX <onboarding@resend.dev>", // sandbox sender until you verify a domain
+        to: user.email, // swap back to user.email when done testing
+        subject: "Verify your email",
+        html: `
+      <h2>Welcome to OX!</h2>
+      <p>Your verification code is:</p>
+      <h1>${verificationCode}</h1>
+      <p>This code expires in 10 minutes.</p>
+    `,
+      });
+
+      if (error) {
+        console.error("Resend error:", error);
+      } else {
+        console.log("9. Email sent:", data.id);
+      }
+    } catch (mailError) {
+      console.error("Mail Error:", mailError);
+    }
+
+    return res.status(200).json({
+      message: "Verification code resent",
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Server error",
+    });
+  }
+});
 
 export default router;
