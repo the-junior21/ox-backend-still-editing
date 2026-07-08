@@ -1,5 +1,5 @@
 import express from "express";
-import resend  from "../utils/resend.js"; // adjust to your setup
+import resend  from "../utils/mail.js"; // adjust to your setup
 import User from "../models/User.js";
 
 const router = express.Router();
