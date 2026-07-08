@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.routes.js";
+import forgotPassword from "./routes/forgot-password.js";
 import roleRoutes from "./routes/role.route.js";
 import userRoutes from "./routes/users/user.routes.js";
 import driverStatus from "./routes/driver/status.js";
@@ -205,6 +206,7 @@ io.on("connection", (socket) => {
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/auth", roleRoutes);
+app.use("/api/auth", forgotPassword);
 app.use("/api/users", userRoutes);
 app.use("/api/driver", driverStatus);
 app.use("/api/passenger", passengerRoute);

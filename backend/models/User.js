@@ -9,6 +9,15 @@ const UserSchema = new mongoose.Schema(
     isVerified: { type: Boolean, default: false },
     verificationCode: { type: String, default: null },
     verificationCodeExpires: { type: Date, default: null },
+    passwordResetCode: {
+      type: String,
+      default: null,
+    },
+
+    passwordResetCodeExpires: {
+      type: Date,
+      default: null,
+    },
     role: {
       type: String,
       enum: ["passenger", "driver"],
