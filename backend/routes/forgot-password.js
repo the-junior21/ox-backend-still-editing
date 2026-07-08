@@ -1,7 +1,7 @@
+import bcrypt from "bcryptjs";
 import express from "express";
 import User from "../models/User.js";
 import resend from "../utils/mail.js"; // adjust to your setup
-
 const router = express.Router();
 
 router.post("/forgot-password", async (req, res) => {
