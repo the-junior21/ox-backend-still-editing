@@ -1,6 +1,6 @@
 import express from "express";
-import resend  from "../utils/mail.js"; // adjust to your setup
 import User from "../models/User.js";
+import resend from "../utils/mail.js"; // adjust to your setup
 
 const router = express.Router();
 
@@ -25,12 +25,10 @@ router.post("/forgot-password", async (req, res) => {
     }
 
     const passwordResetCode = Math.floor(
-      100000 + Math.random() * 900000
+      100000 + Math.random() * 900000,
     ).toString();
 
-    const passwordResetCodeExpires = new Date(
-      Date.now() + 10 * 60 * 1000
-    );
+    const passwordResetCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
 
     user.passwordResetCode = passwordResetCode;
     user.passwordResetCodeExpires = passwordResetCodeExpires;
@@ -65,7 +63,6 @@ router.post("/forgot-password", async (req, res) => {
       userId: user._id.toString(),
       email: user.email,
     });
-
   } catch (error) {
     console.error(error);
 
@@ -193,5 +190,44 @@ router.post("/resend-code-password", async (req, res) => {
   }
 });
 
+router.post("/reset-password", async (req, res) => {
+  const { userId, password } = req.body;
+
+  if (!userId || !password?.trim()) {
+    return res.status(400).json({
+      message: "Missing fields",
+    });
+  }
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    user.password = hashedPassword;
+
+    // Clear reset code
+    user.passwordResetCode = null;
+    user.passwordResetCodeExpires = null;
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Password reset successfully",
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Server error",
+    });
+  }
+});
 
 export default router;
