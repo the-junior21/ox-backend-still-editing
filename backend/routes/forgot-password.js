@@ -192,6 +192,9 @@ router.post("/resend-code-password", async (req, res) => {
 
 router.post("/reset-password", async (req, res) => {
   const { userId, password } = req.body;
+  console.log(req.body);
+  console.log("userId:", userId);
+  console.log("password:", password);
 
   if (!userId || !password?.trim()) {
     return res.status(400).json({
