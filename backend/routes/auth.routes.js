@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import express from "express";
 import User from "../models/User.js";
 import resend from "../utils/mail.js";
+import { generateToken } from "../utils/jwt.js";
 
 const router = express.Router();
 router.post("/login", async (req, res) => {
@@ -23,7 +24,7 @@ router.post("/login", async (req, res) => {
     }
     return res.status(200).json({
       message: "Login successful",
-      userId: user._id,
+      token,
       role: user.role,
     });
   } catch (error) {
