@@ -16,6 +16,8 @@ import rideRequestId from "./routes/rideRequestId/index.js";
 import saveDriverPushToken from './routes/driver/savePushToken.js'
 import saveOneSignalId from "./routes/saveOneSignalId.js"
 import { createServer } from "http";
+import connectDB from "./lib/mongodb.js";
+import driverRoutes from "./routes/drivers.js"
 import { Server } from "socket.io";
 import Ride from "./models/rideSchema.js";
 import User from "./models/User.js";
@@ -210,6 +212,7 @@ app.use("/api/auth", forgotPassword);
 app.use("/api/users", userRoutes);
 app.use("/api/driver", driverStatus);
 app.use("/api/passenger", passengerRoute);
+app.use("/api/drivers",driverRoutes);
 app.use("/api/driver/location", updateDriverLocation);
 app.use("/api/passenger/location", updatePassengerLocation);
 app.use("/api/driver/nearby", nearbyDrivers);

@@ -1,0 +1,43 @@
+import mongoose from "mongoose";
+
+
+const driverSchema = new mongoose.Schema({
+
+vehicle:{
+    type:String,
+    required:true
+},
+
+firstName:String,
+
+lastName:String,
+
+image:String,
+
+birthDate:String,
+
+    frontImage:String,
+    backImage:String,
+    licenseNumber:String,
+    expirationDate:String,
+    picture:String,
+    registration:String,
+    brand:String,
+    model:String,
+    productionYear:String,
+    plateNumber:String,
+    color:String,
+
+
+status:{
+    type:String,
+    default:"pending"
+}
+
+
+},{
+    timestamps:true
+});
+
+
+export default mongoose.model("Driver",driverSchema);

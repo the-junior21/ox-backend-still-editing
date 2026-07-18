@@ -1,12 +1,17 @@
 import User from "../models/User.js";
 import express from "express";
 const router = express.Router();
+import authenticateToken from "../middleware/auth.js";
 
 
-router.post("/role", async (req, res) => {
+router.post(
+  "/role",
+  authenticateToken,
+   async (req, res) => {
       console.log("ROLE BODY:", req.body);
 
-  const { userId, role } = req.body;
+  const {role } = req.body;
+  const userId = req.user.id
 
   if (!userId || !["driver", "passenger"].includes(role)) {
     return res.status(400).json({ message: "Invalid data" });
