@@ -224,7 +224,7 @@ app.use("/api/save-onesignal-id", saveOneSignalId);
 
 
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGDB_URI_NEW)
   .then(() => console.log("MongoDB connected ✅"))
   .catch((err) => console.error(err));
 
