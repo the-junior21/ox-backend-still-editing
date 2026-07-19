@@ -1,43 +1,40 @@
 import mongoose from "mongoose";
 
+const driverSchema = new mongoose.Schema(
+  {
+    vehicle: {
+      type: String,
+      required: true,
+    },
 
-const driverSchema = new mongoose.Schema({
+    firstName: String,
 
-vehicle:{
-    type:String,
-    required:true
-},
+    lastName: String,
 
-firstName:String,
+    image: String,
 
-lastName:String,
+    birthDate: String,
 
-image:String,
+    frontImage: String,
+    backImage: String,
+    licenseNumber: String,
+    expirationDate: String,
+    vehiclePicture: String,
+    vehicleRegistration: String,
+    vehicleBrand: String,
+    vehicleModel: String,
+    productionYear: String,
+    plateNumber: String,
+    vehicleColor: String,
 
-birthDate:String,
+    status: {
+      type: String,
+      default: "pending",
+    },
+  },
+  {
+    timestamps: true,
+  },
+);
 
-    frontImage:String,
-    backImage:String,
-    licenseNumber:String,
-    expirationDate:String,
-    picture:String,
-    registration:String,
-    brand:String,
-    model:String,
-    productionYear:String,
-    plateNumber:String,
-    color:String,
-
-
-status:{
-    type:String,
-    default:"pending"
-}
-
-
-},{
-    timestamps:true
-});
-
-
-export default mongoose.model("Driver",driverSchema);
+export default mongoose.model("Driver", driverSchema);
