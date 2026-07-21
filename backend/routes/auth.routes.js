@@ -1,8 +1,8 @@
 import bcrypt from "bcryptjs";
 import express from "express";
 import User from "../models/User.js";
-import resend from "../utils/mail.js";
 import { generateToken } from "../utils/jwt.js";
+import resend from "../utils/mail.js";
 
 const router = express.Router();
 router.post("/login", async (req, res) => {
@@ -19,10 +19,10 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Email not found " });
     }
     if (!user.isVerified) {
-  return res.status(403).json({
-    message: "Please verify your email first",
-  });
-}
+      return res.status(403).json({
+        message: "Please verify your email first",
+      });
+    }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
@@ -153,9 +153,12 @@ router.post("/verify", async (req, res) => {
     user.verificationCode = null;
     user.verificationCodeExpires = null;
     await user.save();
+    const token = generateToken(user);
+
     return res.status(200).json({
       message: "Email verified successfully",
       userId: user._id,
+      token,
     });
   } catch (error) {
     console.error(error);
