@@ -1,8 +1,9 @@
 import Driver from "../models/Driver.js";
 
 export const applyDriver = async (req, res) => {
-  const userId = req.user.id;
   try {
+    console.log("Apply driver route reached");
+    const userId = req.user.id;
     const existingDriver = await Driver.findOne({
       user: userId,
     });
