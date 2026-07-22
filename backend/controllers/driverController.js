@@ -1,27 +1,30 @@
 import Driver from "../models/Driver.js";
 
-
-export const applyDriver = async(req,res)=>{
-
-try{
-
-const driver = await Driver.create(req.body);
-
-
-res.status(201).json({
-    success:true,
-    message:"Application submitted",
-    driver
-});
-
-
-}catch(error){
-
-res.status(500).json({
-    success:false,
-    message:error.message
-});
-
-}
-
+export const applyDriver = async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const existingDriver = await Driver.findOne({
+      user: userId,
+    });
+    if (existingDriver) {
+      return res.status(400).json({
+        success: false,
+        message: "Driver application already exists",
+      });
+    }
+    const driver = await Driver.create({
+      user: userId,
+      ...user.body,
+    });
+    res.status(201).json({
+      success: true,
+      message: "Application submitted",
+      driver,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };

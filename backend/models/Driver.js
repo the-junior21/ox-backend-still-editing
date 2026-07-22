@@ -6,6 +6,7 @@ const driverSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      unique: true,
     },
     vehicle: {
       type: String,
@@ -34,6 +35,8 @@ const driverSchema = new mongoose.Schema(
 
     status: {
       type: String,
+      enum: ["pending", "approved", "rejected"],
+
       default: "pending",
     },
   },
