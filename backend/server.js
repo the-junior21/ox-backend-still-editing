@@ -1,3 +1,4 @@
+import adminRoutes from "./routes/adminRoutes.js"
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
@@ -221,6 +222,7 @@ app.use("/api/routes/rideRequestId", rideRequestId);
 app.use("/api/users", savePushToken);
 app.use("/api/users", saveDriverPushToken);
 app.use("/api/save-onesignal-id", saveOneSignalId);
+app.use("/api/admin",adminRoutes)
 
 
 mongoose
