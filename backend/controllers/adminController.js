@@ -1,4 +1,4 @@
-import Drievr from "../models/Driver.js"
+import Driver from "../models/Driver.js"
 
 export const getPendingDrivers = async (req,res)=>{
     try{
