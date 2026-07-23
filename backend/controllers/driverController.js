@@ -15,7 +15,7 @@ export const applyDriver = async (req, res) => {
     }
     const driver = await Driver.create({
       user: userId,
-      ...user.body,
+      ...req.body,
     });
     res.status(201).json({
       success: true,
