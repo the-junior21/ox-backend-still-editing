@@ -7,6 +7,8 @@ const router = express.Router()
 
 router.get("/drivers/pending",getPendingDrivers)
 router.get("/drivers/:id",getDriverById)
+router.get("/drivers/:id/approve",)
+router.get("/drivers/:id/rejected",)
 
 
 export default router
