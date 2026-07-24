@@ -20,13 +20,29 @@ export const getPendingDrivers = async (req,res)=>{
 
     }
 }
-export const approveDriver = async (req, res) => {
+export const statusDriver = async (req, res) => {
     try{
+        const {status} = req.body
+        if(!["approved","rejected"].includes(status)){
+            return res.status(400).json({
+                success:false,
+            message:"invalid status",
+            })
+
+        }
         const driver = await Driver.findByIdAndUpdate(
             req.params.id,
-            { status: "approved" },
+            { status},
             { new: true }
         );
+        if (!driver) {
+      return res.status(404).json({
+        success: false,
+        message: "Driver not found",
+      });
+    }
+
+        
         res.status(200).json({
             success:true,
             driver
@@ -40,23 +56,3 @@ export const approveDriver = async (req, res) => {
     }
 }
 
-export const rejectDriver = async (req, res) => {
-    try{
-        const driver = await Driver.findByIdAndUpdate(
-            req.params.id,
-            { status: "rejected" },
-            { new: true }
-        );
-        res.status(200).json({
-            success:true,
-            driver
-        })
-
-    }catch(err){
-        res.status(500).json({
-            success:false,
-            message:err.message
-
-        })
-    }
-}
