@@ -1,5 +1,5 @@
 import express from "express"
-import {getPendingDrivers} from "../controllers/adminController.js"
+import {approveDriver, getPendingDrivers, rejectDriver} from "../controllers/adminController.js"
 import { getDriverById } from "../controllers/driverIdController.js"
 //whats happen 
 
@@ -7,8 +7,8 @@ const router = express.Router()
 
 router.get("/drivers/pending",getPendingDrivers)
 router.get("/drivers/:id",getDriverById)
-router.get("/drivers/:id/approve",)
-router.get("/drivers/:id/rejected",)
+router.get("/drivers/:id/approve",approveDriver)
+router.get("/drivers/:id/rejected",rejectDriver)
 
 
 export default router
