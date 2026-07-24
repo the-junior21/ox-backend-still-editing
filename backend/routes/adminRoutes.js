@@ -6,7 +6,7 @@ import { getDriverById } from "../controllers/driverIdController.js"
 const router = express.Router()
 
 router.get("/drivers/pending",getPendingDrivers)
-router.get("/driver/:id",getDriverById)
+router.get("/drivers/:id",getDriverById)
 
 
 export default router
