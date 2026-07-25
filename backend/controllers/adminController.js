@@ -22,6 +22,8 @@ export const getPendingDrivers = async (req,res)=>{
 }
 export const statusDriver = async (req, res) => {
     try{
+                console.log("STATUS ROUTE HIT");
+
         const {status} = req.body
         if(!["approved","rejected"].includes(status)){
             return res.status(400).json({
@@ -40,9 +42,7 @@ export const statusDriver = async (req, res) => {
         success: false,
         message: "Driver not found",
       });
-    }
-
-        
+    }    
         res.status(200).json({
             success:true,
             driver
