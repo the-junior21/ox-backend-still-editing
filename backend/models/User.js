@@ -37,6 +37,11 @@ const UserSchema = new mongoose.Schema(
       enum: ["ON_TRIP", "OFF_TRIP"],
       default: "OFF_TRIP",
     },
+    driverStatus: {
+  type: String,
+  enum: ["none", "pending", "approved", "rejected"],
+  default: "none",
+},
     pushToken: {
       type: String,
     },

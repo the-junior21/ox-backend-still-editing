@@ -36,7 +36,9 @@ export const statusDriver = async (req, res) => {
             req.params.id,
             { status},
             { new: true }
-        );
+        );await User.findByIdAndUpdate(driver.user, {
+  driverStatus: status,
+});
         if (!driver) {
       return res.status(404).json({
         success: false,

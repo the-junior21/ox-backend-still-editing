@@ -1,4 +1,5 @@
 import Driver from "../models/Driver.js";
+import User from "../models/User.js";
 
 export const applyDriver = async (req, res) => {
   console.log("Apply driver route reached");
@@ -17,6 +18,9 @@ export const applyDriver = async (req, res) => {
       user: userId,
       ...req.body,
     });
+    await User.findByIdAndUpdate(userId, {
+  driverStatus: "pending",
+});
     res.status(201).json({
       success: true,
       message: "Application submitted",
