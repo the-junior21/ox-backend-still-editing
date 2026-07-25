@@ -1,4 +1,5 @@
 import Driver from "../models/Driver.js"
+import User from "../models/User.js"
 
 export const getPendingDrivers = async (req,res)=>{
     try{
