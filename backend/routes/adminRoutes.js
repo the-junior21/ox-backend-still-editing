@@ -7,7 +7,7 @@ const router = express.Router()
 
 router.get("/drivers/pending",getPendingDrivers)
 router.get("/drivers/:id",getDriverById)
-router.get("/drivers/:id/status",statusDriver)
+router.patch("/drivers/:id/status",statusDriver)
 
 
 export default router
