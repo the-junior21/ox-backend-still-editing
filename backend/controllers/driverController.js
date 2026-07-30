@@ -9,24 +9,17 @@ export const applyDriver = async (req, res) => {
       user: userId,
     });
     if (existingDriver) {
-      return res.status(400).json({
-        success: false,
-        message: "Driver application already exists",
-      });
-    }
-    if (existingDriver.status === "pending") {
+          if (existingDriver.status === "pending") {
       return res.status(400).json({
         success: false,
         message: "Application already under review.",
       });
-    }
-    if (existingDriver.status === "approved") {
+    }else if (existingDriver.status === "approved") {
       return res.status(400).json({
         success: false,
         message: "You are already a driver.",
       });
-    }
-    if (existingDriver.status === "rejected") {
+    }else if (existingDriver.status === "rejected") {
       return Object.assign(existingDriver, req.body);
       existingDriver.status = "pending";
       await existingDriver.save();
@@ -40,6 +33,8 @@ export const applyDriver = async (req, res) => {
     driver: existingDriver,
   });
     }
+    }
+
     const driver = await Driver.create({
       user: userId,
       ...req.body,
