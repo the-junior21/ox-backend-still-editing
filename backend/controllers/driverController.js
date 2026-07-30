@@ -20,7 +20,7 @@ export const applyDriver = async (req, res) => {
         message: "You are already a driver.",
       });
     }else if (existingDriver.status === "rejected") {
-      return Object.assign(existingDriver, req.body);
+      Object.assign(existingDriver, req.body);
       existingDriver.status = "pending";
       await existingDriver.save();
       await User.findByIdAndUpdate(userId, {
