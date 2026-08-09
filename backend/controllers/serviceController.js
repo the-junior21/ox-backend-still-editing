@@ -1,5 +1,5 @@
 import Driver from "../models/Driver.js";
-import User from "../models/Service.js";
+import Service from "../models/Service.js";
 
 export const getServices = async (req, res) => {
   console.log("get service route reached");
