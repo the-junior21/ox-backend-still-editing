@@ -225,6 +225,10 @@ app.use("/api/users", saveDriverPushToken);
 app.use("/api/save-onesignal-id", saveOneSignalId);
 app.use("/api/admin",adminRoutes)//lets talk 
 app.use("/api/services", serviceRoutes);
+// In your main app file (e.g. server.js or app.js)
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "alive", timestamp: new Date().toISOString() });
+});
 
 
 mongoose
