@@ -24,6 +24,7 @@ import Ride from "./models/rideSchema.js";
 import User from "./models/User.js";
 import savePushToken from "./routes/users/savePushTokenn.js"
 import fetch from "node-fetch"
+import serviceRoutes from "./routes/serviceRoutes.js"
 
 
 dotenv.config();
@@ -222,7 +223,8 @@ app.use("/api/routes/rideRequestId", rideRequestId);
 app.use("/api/users", savePushToken);
 app.use("/api/users", saveDriverPushToken);
 app.use("/api/save-onesignal-id", saveOneSignalId);
-app.use("/api/admin",adminRoutes)
+app.use("/api/admin",adminRoutes)//lets talk 
+app.use("/api/services", serviceRoutes);
 
 
 mongoose
