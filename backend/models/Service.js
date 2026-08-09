@@ -4,9 +4,19 @@ const serviceSchema = new mongoose.Schema(
   {
 
 
-    title: {
-      type: String,
-      required: true,
+   title: {
+      en: {
+        type: String,
+        required: true,
+      },
+      fr: {
+        type: String,
+        required: true,
+      },
+      ar: {
+        type: String,
+        required: true,
+      },
     },
 
     image: {
