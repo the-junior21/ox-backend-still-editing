@@ -25,6 +25,7 @@ import User from "./models/User.js";
 import savePushToken from "./routes/users/savePushTokenn.js"
 import fetch from "node-fetch"
 import serviceRoutes from "./routes/serviceRoutes.js"
+import offersRoutes from "./routes/offersRoutes.js"
 
 
 dotenv.config();
@@ -225,6 +226,7 @@ app.use("/api/users", saveDriverPushToken);
 app.use("/api/save-onesignal-id", saveOneSignalId);
 app.use("/api/admin",adminRoutes)//lets talk 
 app.use("/api/services", serviceRoutes);
+app.use("/api/offers", offersRoutes);
 // In your main app file (e.g. server.js or app.js)
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "alive", timestamp: new Date().toISOString() });
