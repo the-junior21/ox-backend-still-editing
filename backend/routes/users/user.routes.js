@@ -37,7 +37,7 @@ import User from "../../models/User.js"
     res.status(500).json({ message: "Server error" });
   }
 });
-router.get("/:id", async (req, res) => {
+router.get("get/pin/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("pin");
     if (!user) return res.status(404).json({ message: "User not found" });
