@@ -46,6 +46,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
     },
     oneSignalId: { type: String },
+    pin: {
+  type: String,
+  select: false, // don't return it by default in normal queries, for security
+},
   },
   { timestamps: true },
 );
