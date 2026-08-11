@@ -16,7 +16,7 @@ import User from "../../models/User.js"
   try {
     const { pin,userId } = req.body;
 
-    if (!pin || !/^\d{4}$/.test(pin)) {
+    if (!pin !== null && !/^\d{4}$/.test(pin)) {
       return res.status(400).json({ message: "Invalid PIN format" });
     }
  if (!userId) {
@@ -34,6 +34,15 @@ import User from "../../models/User.js"
     res.status(200).json({ message: "PIN saved", pin: user.pin });
   } catch (error) {
     console.log("Error saving PIN:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+router.get("/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("pin");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.status(200).json(user);
+  } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
 });
