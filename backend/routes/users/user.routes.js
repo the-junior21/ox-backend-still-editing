@@ -16,7 +16,7 @@ import User from "../../models/User.js"
   try {
     const { pin,userId } = req.body;
 
-    if (!pin !== null && !/^\d{4}$/.test(pin)) {
+    if (pin !== null && !/^\d{4}$/.test(pin)) {
       return res.status(400).json({ message: "Invalid PIN format" });
     }
  if (!userId) {
