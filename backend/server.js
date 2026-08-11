@@ -25,7 +25,6 @@ import User from "./models/User.js";
 import savePushToken from "./routes/users/savePushTokenn.js"
 import fetch from "node-fetch"
 import serviceRoutes from "./routes/serviceRoutes.js"
-import pinVerificationRoutes from "./routes/pinVerificationRoutes.js"
 import offersRoutes from "./routes/offersRoutes.js"
 
 
