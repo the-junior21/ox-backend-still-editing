@@ -37,6 +37,44 @@ import User from "../../models/User.js"
     res.status(500).json({ message: "Server error" });
   }
 });
+router.patch("/emergency-contacts", async (req, res) => {
+  try {
+    const { userId, contacts } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ message: "userId is required" });
+    }
+
+    if (!Array.isArray(contacts)) {
+      return res.status(400).json({ message: "contacts must be an array" });
+    }
+
+    if (contacts.length > 5) {
+      return res.status(400).json({ message: "Maximum 5 contacts allowed" });
+    }
+
+    // validate each contact has name + phoneNumber
+    const isValid = contacts.every((c) => c.name && c.phoneNumber);
+    if (!isValid) {
+      return res.status(400).json({ message: "Each contact needs a name and phoneNumber" });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { emergencyContacts: contacts },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ message: "Emergency contacts saved", emergencyContacts: user.emergencyContacts });
+  } catch (error) {
+    console.log("Error saving emergency contacts:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 router.get("/get/pin/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("pin");

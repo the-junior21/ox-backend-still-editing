@@ -50,6 +50,12 @@ const UserSchema = new mongoose.Schema(
   type: String,
   select: false, // don't return it by default in normal queries, for security
 },
+emergencyContacts: [
+  {
+    name: { type: String, required: true },
+    phoneNumber: { type: String, required: true },
+  },
+],
   },
   { timestamps: true },
 );
