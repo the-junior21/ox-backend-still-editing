@@ -207,8 +207,9 @@ io.on("connection", (socket) => {
   });
   
 });
-
 app.use(express.json());
+const placesRouter = require("./routes/places");
+app.use("/api/places", placesRouter);
 app.use("/api/auth", authRoutes);
 app.use("/api/auth", roleRoutes);
 app.use("/api/auth", forgotPassword);
