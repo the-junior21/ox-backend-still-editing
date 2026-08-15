@@ -25,6 +25,8 @@ import User from "./models/User.js";
 import savePushToken from "./routes/users/savePushTokenn.js"
 import fetch from "node-fetch"
 import serviceRoutes from "./routes/serviceRoutes.js"
+import placesRouter from "./routes/places.js";
+
 import offersRoutes from "./routes/offersRoutes.js"
 
 
@@ -208,7 +210,6 @@ io.on("connection", (socket) => {
   
 });
 app.use(express.json());
-const placesRouter = require("./routes/places.js");
 app.use("/api/places", placesRouter);
 app.use("/api/auth", authRoutes);
 app.use("/api/auth", roleRoutes);
