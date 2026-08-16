@@ -84,4 +84,17 @@ router.get("/get/pin/:id", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+router.get("/users/:userId/emergency-contacts", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).select("emergencyContacts");
+
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    res.json(user.emergencyContacts || []);
+  } catch (err) {
+    console.error("Get emergency contacts error:", err);
+    res.status(500).json({ error: "Failed to fetch emergency contacts" });
+  }
+});
+
  export default router
