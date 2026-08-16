@@ -84,7 +84,7 @@ router.get("/get/pin/:id", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-router.get("get/emergency-contacts/:id", async (req, res) => {
+router.get("/get/emergency-contacts/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("emergencyContacts");
 
