@@ -86,7 +86,7 @@ router.get("/get/pin/:id", async (req, res) => {
 });
 router.get("/users/:id/emergency-contacts", async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId).select("emergencyContacts");
+    const user = await User.findById(req.params.id).select("emergencyContacts");
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
