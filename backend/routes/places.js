@@ -30,6 +30,14 @@ router.get("/search", async (req, res) => {
     }
 
     const data = await response.json();
+     const stripTifinagh = (text) =>
+      text
+        .replace(/[\u2D30-\u2D7F]+/g, "")
+        .replace(/\s*,\s*,/g, ",")
+        .replace(/\s{2,}/g, " ")
+        .replace(/^,\s*|,\s*$/g, "")
+        .trim();
+ 
 
     const formatted = data.map((item) => ({
       place_id: item.place_id,
