@@ -41,7 +41,7 @@ router.get("/search", async (req, res) => {
 
     const formatted = data.map((item) => ({
       place_id: item.place_id,
-      description: item.display_name,
+      description: stripTifinagh(item.display_name),
       lat: parseFloat(item.lat),
       lng: parseFloat(item.lon),
     }));
