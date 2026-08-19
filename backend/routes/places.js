@@ -52,5 +52,49 @@ router.get("/search", async (req, res) => {
     res.status(500).json({ error: "Places search failed" });
   }
 });
+// alongside existing /search route)
+router.get("/reverse", async (req, res) => {
+  const { lat, lng } = req.query;
+
+  if (!lat || !lng) {
+    return res.status(400).json({ error: "lat and lng are required" });
+  }
+
+  const url =
+    `https://nominatim.openstreetmap.org/reverse?` +
+    `lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}` +
+    `&format=json&addressdetails=1`;
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "OXMVP/1.0 (contact: yourrealemail@gmail.com)",
+      },
+    });
+
+    if (!response.ok) {
+      return res.status(502).json({ error: `Nominatim error: ${response.status}` });
+    }
+
+    const item = await response.json();
+
+    const stripTifinagh = (text) =>
+      text
+        .replace(/[\u2D30-\u2D7F]+/g, "")
+        .replace(/\s*,\s*,/g, ",")
+        .replace(/\s{2,}/g, " ")
+        .replace(/^,\s*|,\s*$/g, "")
+        .trim();
+
+    res.json({
+      description: stripTifinagh(item.display_name || ""),
+      lat: parseFloat(item.lat),
+      lng: parseFloat(item.lon),
+    });
+  } catch (err) {
+    console.error("Reverse geocode error:", err);
+    res.status(500).json({ error: "Reverse geocode failed" });
+  }
+});
 
 export default router;
