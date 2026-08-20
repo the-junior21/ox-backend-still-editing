@@ -73,6 +73,9 @@ router.get("/reverse", async (req, res) => {
     });
 
     if (!response.ok) {
+            const text = await response.text();
+
+      console.error("Nominatim reverse failed:", response.status, text);
       return res.status(502).json({ error: `Nominatim error: ${response.status}` });
     }
 
@@ -92,9 +95,7 @@ router.get("/reverse", async (req, res) => {
       lng: parseFloat(item.lon),
     });
   } catch (err) {
-      const text = await response.text();
 
-      console.error("Nominatim reverse failed:", response.status, text);
 
     console.error("Reverse geocode error:", err);
     res.status(500).json({ error: "Reverse geocode failed" });
