@@ -1,4 +1,5 @@
 // routes/places.js
+/*
 import express from "express";
 const router = express.Router();
 
@@ -97,6 +98,91 @@ router.get("/reverse", async (req, res) => {
   } catch (err) {
 
 
+    console.error("Reverse geocode error:", err);
+    res.status(500).json({ error: "Reverse geocode failed" });
+  }
+});
+
+export default router;*/
+///////////////// we'll back to the previous later
+//////////////////
+/////////////////
+/////////////////
+// routes/places.js
+import express from "express";
+const router = express.Router();
+
+const LOCATIONIQ_KEY = process.env.LOCATIONIQ_KEY; // set this in your .env / Render env vars
+const COUNTRY_CODE = "dz";
+
+const stripTifinagh = (text) =>
+  text
+    .replace(/[\u2D30-\u2D7F]+/g, "")
+    .replace(/\s*,\s*,/g, ",")
+    .replace(/\s{2,}/g, " ")
+    .replace(/^,\s*|,\s*$/g, "")
+    .trim();
+
+// GET /api/places/search?q=some+address
+router.get("/search", async (req, res) => {
+  const q = (req.query.q || "").trim();
+  if (q.length < 3) return res.json([]);
+
+  const url =
+    `https://us1.locationiq.com/v1/autocomplete?key=${LOCATIONIQ_KEY}` +
+    `&q=${encodeURIComponent(q)}&limit=6&countrycodes=${COUNTRY_CODE}`;
+
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      const text = await response.text();
+      console.error("LocationIQ search failed:", response.status, text);
+      return res.status(502).json({ error: `LocationIQ error: ${response.status}` });
+    }
+
+    const data = await response.json();
+
+    const formatted = data.map((item) => ({
+      place_id: item.place_id,
+      description: stripTifinagh(item.display_name),
+      lat: parseFloat(item.lat),
+      lng: parseFloat(item.lon),
+    }));
+
+    res.json(formatted);
+  } catch (err) {
+    console.error("Places search error:", err);
+    res.status(500).json({ error: "Places search failed" });
+  }
+});
+
+// GET /api/places/reverse?lat=..&lng=..
+router.get("/reverse", async (req, res) => {
+  const { lat, lng } = req.query;
+  if (!lat || !lng) return res.status(400).json({ error: "lat and lng are required" });
+
+  const url =
+    `https://us1.locationiq.com/v1/reverse?key=${LOCATIONIQ_KEY}` +
+    `&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}&format=json`;
+
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      const text = await response.text();
+      console.error("LocationIQ reverse failed:", response.status, text);
+      return res.status(502).json({ error: `LocationIQ error: ${response.status}` });
+    }
+
+    const item = await response.json();
+
+    res.json({
+      description: stripTifinagh(item.display_name || ""),
+      lat: parseFloat(item.lat),
+      lng: parseFloat(item.lon),
+    });
+  } catch (err) {
     console.error("Reverse geocode error:", err);
     res.status(500).json({ error: "Reverse geocode failed" });
   }
