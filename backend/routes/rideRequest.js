@@ -1,10 +1,11 @@
 import express from "express";
-import Ride from "../models/rideSchema.js";
-import { io, onlineDrivers } from "../server.js";
-import User from "../models/User.js";
 import fetch from "node-fetch";
+import Ride from "../models/rideSchema.js";
+import User from "../models/User.js";
+import { io, onlineDrivers } from "../server.js";
 
 const router = express.Router();
+
 async function sendPushNotification(expoPushToken, title, body, data = {}) {
   try {
     await fetch("https://exp.host/--/api/v2/push/send", {
@@ -40,84 +41,138 @@ function getDistanceKm(lat1, lng1, lat2, lng2) {
   return R * c;
 }
 
+function isValidLocation(loc) {
+  return (
+    loc &&
+    typeof loc.address === "string" &&
+    loc.address.trim().length > 0 &&
+    typeof loc.lat === "number" &&
+    typeof loc.lng === "number"
+  );
+}
+
+// POST /api/rides
 router.post("/", async (req, res) => {
   try {
-    const { passengerId, depart, destination, pickupLocation } = req.body;
-    if (
-      !passengerId ||
-      !depart ||
-      !destination ||
-      !pickupLocation?.lat ||
-      !pickupLocation?.lng
-    ) {
-      return res.status(400).json({
-        message: "Missing required fields",
-      });
+    const {
+      passengerId,
+      pickup,
+      destination,
+      stops = [],
+      rideType,
+      distanceKm,
+      durationMin,
+      price,
+    } = req.body;
+
+    if (!passengerId) {
+      return res.status(400).json({ message: "passengerId is required" });
     }
-    const { lat, lng } = pickupLocation;
+    if (!isValidLocation(pickup)) {
+      return res.status(400).json({ message: "Valid pickup { address, lat, lng } is required" });
+    }
+    if (!isValidLocation(destination)) {
+      return res.status(400).json({ message: "Valid destination { address, lat, lng } is required" });
+    }
+    if (!rideType) {
+      return res.status(400).json({ message: "rideType is required" });
+    }
+    if (typeof distanceKm !== "number" || typeof durationMin !== "number") {
+      return res.status(400).json({ message: "distanceKm and durationMin must be numbers" });
+    }
+    if (typeof price !== "number") {
+      return res.status(400).json({ message: "price must be a number" });
+    }
+
+    const validStops = Array.isArray(stops) ? stops.filter(isValidLocation) : [];
 
     const ride = await Ride.create({
-      passengerId: passengerId,
-      pickupLocation: {
-        name: depart,
-        location: {
-          lat:lat,
-          lng:lng,
-        },
-      },
-      destination: {
-        name: destination,
-      },
+      passengerId,
+      pickup,
+      destination,
+      stops: validStops,
+      rideType,
+      distanceKm,
+      durationMin,
+      price,
       status: "SEARCHING",
     });
 
+    // find nearby online drivers via plain Haversine, same pattern as before
     const drivers = await User.find({
       role: "driver",
       isOnline: true,
       "location.lat": { $exists: true },
       "location.lng": { $exists: true },
     });
-    console.log("Drivers found:", drivers.length);
 
-    console.log("Online drivers map:", onlineDrivers);
     const nearbyDrivers = drivers.filter((driver) => {
       if (!driver.location) return false;
-      const driverLat = driver.location.lat;
-      const driverLng = driver.location.lng;
-      const distance = getDistanceKm(lat, lng, driverLat, driverLng);
+      const distance = getDistanceKm(
+        pickup.lat,
+        pickup.lng,
+        driver.location.lat,
+        driver.location.lng,
+      );
       return distance <= 100;
     });
-    console.log("nearby drivers : ", nearbyDrivers.length);
 
     nearbyDrivers.forEach((driver) => {
       const socketId = onlineDrivers.get(driver._id.toString());
       if (socketId) {
         io.to(socketId).emit("new_ride_request", {
           rideId: ride._id,
-          pickupLocation: { lat, lng, name: depart },
-          destination: { name: destination },
+          pickup,
+          destination,
+          stops: validStops,
+          rideType,
+          price,
         });
-        console.log("Driver:", driver._id.toString(), "Socket:", socketId);
       }
       if (driver.pushToken) {
         sendPushNotification(
           driver.pushToken,
           "New Ride Request",
-          `Pickup at ${depart}, destination ${destination}`,
+          `Pickup at ${pickup.address}, destination ${destination.address}`,
           { rideId: ride._id },
         );
       }
     });
+
     res.status(201).json({
       message: "Ride request created",
       rideId: ride._id,
       status: ride.status,
     });
   } catch (error) {
-    console.error("Ride Request Error: ", error);
-    res.status(500).json({
-      message: "Server error",
-    });
+    console.error("Ride Request Error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
+
+// GET /api/rides/:id
+router.get("/:id", async (req, res) => {
+  try {
+    const ride = await Ride.findById(req.params.id).populate("driverId", "name phoneNumber");
+
+    if (!ride) {
+      return res.status(404).json({ message: "Ride not found" });
+    }
+
+    res.json({
+      status: ride.status,
+      driver: ride.driverId,
+      pickup: ride.pickup,
+      destination: ride.destination,
+      stops: ride.stops,
+      rideType: ride.rideType,
+      price: ride.price,
+      distanceKm: ride.distanceKm,
+      durationMin: ride.durationMin,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 export default router;
