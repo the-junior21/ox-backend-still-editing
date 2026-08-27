@@ -4,7 +4,7 @@ import User from "../../models/User.js";
 
 const router = express.Router();
 
-router.post("/status", async (req, res) => {
+router.patch("/status", async (req, res) => {
   try {
     const { userId, isOnline } = req.body;
 console.log("Request body:", req.body);

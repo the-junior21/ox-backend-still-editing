@@ -106,16 +106,24 @@ router.post("/", async (req, res) => {
       "location.lng": { $exists: true },
     });
 
-    const nearbyDrivers = drivers.filter((driver) => {
-      if (!driver.location) return false;
-      const distance = getDistanceKm(
-        pickup.lat,
-        pickup.lng,
-        driver.location.lat,
-        driver.location.lng,
-      );
-      return distance <= 100;
-    });
+    const SEARCH_RADIUS_KM = 15; // realistic dispatch radius, not 100km
+    const MAX_DRIVERS_NOTIFIED = 5; // notify closest N, not everyone in range
+
+    const nearbyDrivers = drivers
+      .filter((driver) => driver.location)
+      .map((driver) => ({
+        driver,
+        distance: getDistanceKm(
+          pickup.lat,
+          pickup.lng,
+          driver.location.lat,
+          driver.location.lng,
+        ),
+      }))
+      .filter((d) => d.distance <= SEARCH_RADIUS_KM)
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, MAX_DRIVERS_NOTIFIED)
+      .map((d) => d.driver);
 
     nearbyDrivers.forEach((driver) => {
       const socketId = onlineDrivers.get(driver._id.toString());
