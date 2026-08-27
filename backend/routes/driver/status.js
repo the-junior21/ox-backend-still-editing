@@ -43,5 +43,31 @@ console.log("Request body:", req.body);
     return res.status(500).json({ message: "Server error" });
   }
 });
+router.get("/status/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const driver = await User.findById(userId).select("isOnline");
+
+    if (!driver) {
+      return res.status(404).json({
+        success: false,
+        message: "Driver not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      isOnline: driver.isOnline,
+    });
+  } catch (error) {
+    console.error("Get driver status error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to get driver status",
+    });
+  }
+});
 
 export default router;
