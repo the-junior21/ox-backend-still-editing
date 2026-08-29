@@ -28,10 +28,11 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    location: {
-      lat: Number,
-      lng: Number,
-    },
+   location: {
+  lat: { type: Number },
+  lng: { type: Number },
+  updatedAt: { type: Date },
+},
     status: {
       type: String,
       enum: ["ON_TRIP", "OFF_TRIP"],

@@ -73,7 +73,14 @@ const onlinePassengers = new Map();
 
 io.on("connection", (socket) => {
   console.log("A user connected: ", socket.id);
+// wherever your socket connection handler lives
+socket.on("update_location", async ({ driverId, lat, lng }) => {
+  if (typeof lat !== "number" || typeof lng !== "number") return;
 
+  await User.findByIdAndUpdate(driverId, {
+    location: { lat, lng, updatedAt: new Date() },
+  });
+});
   socket.on("accept_ride", async ({ driverId, rideId }) => {
     try {
       const ride = await Ride.findById(rideId);
