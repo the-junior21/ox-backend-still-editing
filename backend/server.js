@@ -151,6 +151,11 @@ io.on("connection", (socket) => {
     onlineDrivers.set(driverId, socket.id);
     console.log("✅ Driver ONLINE:", driverId, socket.id);
   });
+  socket.on("driver_offline", (driverId) => {
+  onlineDrivers.delete(driverId);
+
+  console.log("❌ Driver OFFLINE:", driverId);
+});
   socket.on("passenger_online", (passengerId) => {
     onlinePassengers.set(passengerId, socket.id);
     console.log("✅ passenger ONLINE:", passengerId, socket.id);

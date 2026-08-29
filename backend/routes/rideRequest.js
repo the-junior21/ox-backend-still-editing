@@ -126,7 +126,7 @@ router.post("/", async (req, res) => {
       .map((d) => d.driver);
 
     nearbyDrivers.forEach((driver) => {
-      const socketId = onlineDrivers.get(driver._id.toString());
+const socketId = onlineDrivers.get(driver._id.toString());
       if (socketId) {
         io.to(socketId).emit("new_ride_request", {
           rideId: ride._id,
@@ -134,6 +134,8 @@ router.post("/", async (req, res) => {
           destination,
           stops: validStops,
           rideType,
+            distanceKm,
+  durationMin,
           price,
         });
       }
