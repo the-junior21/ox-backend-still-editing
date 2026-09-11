@@ -186,11 +186,11 @@ router.get("/:id", async (req, res) => {
 });
 
 
-router.patch("/:rideId/accept", async (req, res) => {
+router.patch("/:id/accept", async (req, res) => {
   try {
     const ride = await Ride.findOneAndUpdate(
       {
-        _id: req.params.rideId,
+        _id: req.params.id,
         status: "searching",
         driverId: null,
       },
