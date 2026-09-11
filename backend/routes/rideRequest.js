@@ -191,12 +191,12 @@ router.patch("/:id/accept", async (req, res) => {
     const ride = await Ride.findOneAndUpdate(
       {
         _id: req.params.id,
-        status: "searching",
+        status: "SEARCHING",
         driverId: null,
       },
       {
         driverId: req.body.driverId,
-        status: "accepted",
+        status: "ACCEPTED",
       },
       {
         new: true,
