@@ -185,4 +185,42 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+
+router.patch("/:rideId/accept", async (req, res) => {
+  try {
+    const ride = await Ride.findOneAndUpdate(
+      {
+        _id: req.params.rideId,
+        status: "searching",
+        driverId: null,
+      },
+      {
+        driverId: req.body.driverId,
+        status: "accepted",
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (!ride) {
+      return res.status(409).json({
+        message: "Ride is no longer available",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Ride accepted successfully",
+      ride,
+    });
+
+  } catch (error) {
+    console.error("Accept ride error:", error);
+
+    return res.status(500).json({
+      message: "Server error",
+    });
+  }
+});
+
 export default router;
