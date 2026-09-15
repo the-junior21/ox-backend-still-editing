@@ -43,6 +43,51 @@ console.log("Request body:", req.body);
     return res.status(500).json({ message: "Server error" });
   }
 });
+router.patch("/availabilityStatus", async (req, res) => {
+  try {
+    const { userId, status } = req.body;
+    const allowedStatuses = ["OFFTRIP", "ONTRIP"];
+
+console.log("Request body:", req.body);
+
+    // Validate input
+    if (!userId || !status) {
+      return res.status(400).json({ message: "Invalid userId or status" });
+    }
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid driver ID" });
+    }
+if (!allowedStatuses.includes(status)) {
+  return res.status(400).json({
+    message: "Invalid driver status",
+  });
+}
+    // Update driver
+    const driver = await User.findOneAndUpdate(
+      { _id: userId, role: "driver" },
+      { status },
+      { new: true } // return updated document
+    );
+
+    if (!driver) {
+      return res.status(404).json({ message: "Driver not found" });
+    }
+
+    console.log("Driver updated:", driver);
+
+    return res.json({
+      message:  `Driver is ${status}`,
+      userId: driver._id,
+      status: driver.status,
+    }
+);
+  } catch (err) {
+    console.error("SERVER ERROR:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
 router.get("/status/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
