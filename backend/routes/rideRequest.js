@@ -102,6 +102,7 @@ router.post("/", async (req, res) => {
     const drivers = await User.find({
       role: "driver",
       isOnline: true,
+      status:"OFF_TRIP",
       "location.lat": { $exists: true },
       "location.lng": { $exists: true },
     });
