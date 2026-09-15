@@ -46,7 +46,7 @@ console.log("Request body:", req.body);
 router.patch("/availabilityStatus", async (req, res) => {
   try {
     const { userId, status } = req.body;
-    const allowedStatuses = ["OFFTRIP", "ONTRIP"];
+    const allowedStatuses = ["OFF_TRIP", "ON_TRIP"];
 
 console.log("Request body:", req.body);
 
