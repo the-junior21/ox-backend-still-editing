@@ -293,5 +293,43 @@ router.patch("/:id/start", async (req, res) => {
     });
   }
 });
+router.patch("/:id/completed", async (req, res) => {
+  try {
+    const ride = await Ride.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        status: "ONGOING",
+        driverId: req.body.driverId,
+      },
+      {
+        status: "COMPLETED",
+      },
+      {
+        new: true,
+      }
+    );
+
+
+    if (!ride) {
+      return res.status(409).json({
+        message: "Ride is no longer available or not assigned to this driver",
+      });
+    }
+          await User.findByIdAndUpdate(req.body.driverId, {
+            status: "OFF_TRIP",
+          });
+    return res.status(200).json({
+      message: "RIDE completed successfully",
+      ride,
+    });
+
+  } catch (error) {
+    console.error("completed ride error:", error);
+
+    return res.status(500).json({
+      message: "Server error",
+    });
+  }
+});
 
 export default router;
