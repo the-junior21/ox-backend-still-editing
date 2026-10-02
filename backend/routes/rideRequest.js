@@ -331,5 +331,87 @@ router.patch("/:id/completed", async (req, res) => {
     });
   }
 });
+router.patch("/:id/passengerCancellation", async (req, res) => {
+  try {
+    const ride = await Ride.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        status: {
+          $in:  ["SEARCHING" || "ACCEPTED" || "ARRIVED"],
+          
+        },
+      },
+      {
+        status: "CANCELLED",
+        cancelledBy: "PASSENGER",
+        cancelledAt: new Date(),
+      },
+      {
+        new: true,
+      }
+    );
+
+
+    if (!ride) {
+      return res.status(409).json({
+        message: "Ride is no longer available or not assigned to this driver",
+      });
+    }
+    return res.status(200).json({
+      message: "RIDE cancelled successfully",
+      ride,
+    });
+
+  } catch (error) {
+    console.error("cancelled ride error:", error);
+
+    return res.status(500).json({
+      message: "Server error",
+    });
+  }
+});
+router.patch("/:id/driverCancellation", async (req, res) => {
+  try {
+    const ride = await Ride.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        status: {
+          $in:  ["ACCEPTED" || "ARRIVED" || "ONGOING"],
+          
+        },
+        driverId: req.body.driverId,
+      },
+      {
+        status: "CANCELLED",
+                cancelledBy: "DRIVER",
+        cancelledAt: new Date(),
+      },
+      {
+        new: true,
+      }
+    );
+
+
+    if (!ride) {
+      return res.status(409).json({
+        message: "Ride is no longer available or not assigned to this driver",
+      });
+    }
+          await User.findByIdAndUpdate(req.body.driverId, {
+            status: "OFF_TRIP",
+          });
+    return res.status(200).json({
+      message: "RIDE cancelled successfully",
+      ride,
+    });
+
+  } catch (error) {
+    console.error("completed ride error:", error);
+
+    return res.status(500).json({
+      message: "Server error",
+    });
+  }
+});
 
 export default router;
