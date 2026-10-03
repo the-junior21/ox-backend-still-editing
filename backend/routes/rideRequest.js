@@ -334,34 +334,44 @@ router.patch("/:id/completed", async (req, res) => {
 router.patch("/:id/passengerCancellation", async (req, res) => {
   try {
     const ride = await Ride.findOneAndUpdate(
+
+{
+    _id: req.params.id,
+
+    $or: [
       {
-        _id: req.params.id,
+        status: "SEARCHING",
+        driverId: null,
+      },
+      {
         status: {
-          $in:  ["SEARCHING" || "ACCEPTED" || "ARRIVED"],
-          
+          $in: ["ACCEPTED", "ARRIVED","ONGOING"],
         },
+        driverId: req.body.driverId,
       },
-      {
-        status: "CANCELLED",
-        cancelledBy: "PASSENGER",
-        cancelledAt: new Date(),
-      },
-      {
-        new: true,
-      }
-    );
-
-
+    ],
+  },
+{
+    status: "CANCELLED",
+    cancelledBy: "PASSENGER",
+    cancelledAt: new Date(),
+  },
+{
+    new: true,
+  })
     if (!ride) {
       return res.status(409).json({
         message: "Ride is no longer available or not assigned to this driver",
       });
     }
+    await User.findByIdAndUpdate(req.body.driverId, {
+            status: "OFF_TRIP",
+          });
     return res.status(200).json({
       message: "RIDE cancelled successfully",
       ride,
     });
-
+  
   } catch (error) {
     console.error("cancelled ride error:", error);
 
@@ -390,8 +400,6 @@ router.patch("/:id/driverCancellation", async (req, res) => {
         new: true,
       }
     );
-
-
     if (!ride) {
       return res.status(409).json({
         message: "Ride is no longer available or not assigned to this driver",
