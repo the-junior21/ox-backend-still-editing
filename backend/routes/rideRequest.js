@@ -386,7 +386,7 @@ router.patch("/:id/driverCancellation", async (req, res) => {
       {
         _id: req.params.id,
         status: {
-          $in:  ["ACCEPTED" || "ARRIVED" || "ONGOING"],
+          $in:  ["ACCEPTED" , "ARRIVED" , "ONGOING"],
           
         },
         driverId: req.body.driverId,
