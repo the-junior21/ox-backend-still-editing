@@ -137,10 +137,9 @@ export const login = async (req, res) => {
     
     // 4. never send the hash back
     res.status(201).json({
-      message: "Account created",
-      admin: {
+      message: "login successful",
+      user: {
         id: admin._id,
-        username: admin.username,
         email: admin.email,
       },
     });
