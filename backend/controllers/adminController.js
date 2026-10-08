@@ -82,7 +82,7 @@ export const register = async (req, res) => {
     const normalizedUsername = username.trim();
 
     // 2. reject duplicates
-    const existing = await User.findOne({
+    const existing = await Admin.findOne({
       $or: [{ email: normalizedEmail }, { username: normalizedUsername }],
     });
     if (existing) {
@@ -93,7 +93,7 @@ export const register = async (req, res) => {
     // 3. hash + create
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({
+    const user = await Admin.create({
       username: normalizedUsername,
       email: normalizedEmail,
       password: hashedPassword,
