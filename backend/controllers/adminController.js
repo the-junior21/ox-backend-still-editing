@@ -113,4 +113,40 @@ export const register = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+export const login = async (req, res) => {
+  try {
+    const {email, password } = req.body;
+
+    // 1. validate
+    if (!email || !password) {
+      return res.status(400).json({ message: "username, email and password are required" });
+    }
+    
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // 2. reject duplicates
+    const admin = await Admin.findOne({email: normalizedEmail});
+    if (!admin) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+    const passwordMatches = await bcrypt.compare(password, admin.password);
+    if (!passwordMatches) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+    
+    
+    // 4. never send the hash back
+    res.status(201).json({
+      message: "Account created",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+    });
+  } catch (err) {
+    console.error("login error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
