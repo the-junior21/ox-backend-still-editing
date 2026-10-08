@@ -1,6 +1,7 @@
 import Driver from "../models/Driver.js"
 import User from "../models/User.js"
-
+import bcrypt from "bcryptjs";
+import Admin from "../models/Admins.js";
 export const getPendingDrivers = async (req,res)=>{
     try{
         const drivers = await Driver.find({
@@ -58,4 +59,58 @@ export const statusDriver = async (req, res) => {
         })
     }
 }
+
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export const register = async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+
+    // 1. validate
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: "username, email and password are required" });
+    }
+    if (!EMAIL_REGEX.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+    if (password.length < 8) {
+      return res.status(400).json({ message: "Password must be at least 8 characters" });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedUsername = username.trim();
+
+    // 2. reject duplicates
+    const existing = await User.findOne({
+      $or: [{ email: normalizedEmail }, { username: normalizedUsername }],
+    });
+    if (existing) {
+      const field = existing.email === normalizedEmail ? "Email" : "Username";
+      return res.status(409).json({ message: `${field} already in use` });
+    }
+
+    // 3. hash + create
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      username: normalizedUsername,
+      email: normalizedEmail,
+      password: hashedPassword,
+    });
+
+    // 4. never send the hash back
+    res.status(201).json({
+      message: "Account created",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+    });
+  } catch (err) {
+    console.error("Register error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
