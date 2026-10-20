@@ -7,8 +7,9 @@ export const getPendingDrivers = async (req,res)=>{
         const drivers = await Driver.find({
             status:"pending",
         }).select(
-    "firstName lastName phoneNumber vehicle vehicleBrand vehicleModel image status createdAt"
-        )
+    "firstName lastName vehicle vehicleBrand vehicleModel productionYear plateNumber vehicleColor image status createdAt"
+        ).populate("user", "email number");
+
         res.status(200).json({
             success:true,
             drivers,
