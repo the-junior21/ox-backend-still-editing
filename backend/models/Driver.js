@@ -39,6 +39,7 @@ const driverSchema = new mongoose.Schema(
 
       default: "pending",
     },
+    reason:String,
   },
   {
     timestamps: true,
