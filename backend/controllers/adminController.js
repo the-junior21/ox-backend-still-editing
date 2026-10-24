@@ -23,27 +23,28 @@ export const getPendingDrivers = async (req,res)=>{
 
     }
 }
-export const getApprovedDrivers = async (req, res) => {
-  try {
-    const drivers = await Driver.find({
-      status: "approved",
-    })
-      .select(
-        "firstName lastName vehicle vehicleBrand vehicleModel productionYear plateNumber vehicleColor image status createdAt"
-      )
-      .populate("user", "email number");
+export const getApprovedDrivers = async (req,res)=>{
+    try{
+        const drivers = await Driver.find({
+            status:"approved",
+        }).select(
+    "firstName lastName vehicle vehicleBrand vehicleModel productionYear plateNumber vehicleColor image status createdAt"
+        ).populate("user", "email number");
 
-    return res.status(200).json({
-      success: true,
-      drivers,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
-};
+        res.status(200).json({
+            success:true,
+            drivers,
+        })
+
+    }catch(err){
+        res.status(500).json({
+            success:false,
+            message:err.message
+        })
+
+    }
+}
+
 
 export const getRejectedDrivers = async (req, res) => {
   try {
