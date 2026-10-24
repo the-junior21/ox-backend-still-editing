@@ -9,7 +9,7 @@ const router = express.Router()
 
 router.get("/drivers/pending",getPendingDrivers)
 router.get("/drivers/rejected",getRejectedDrivers)
-router.get("/drivers/pending",getApprovedDrivers)
+router.get("/drivers/approved",getApprovedDrivers)
 router.get("/drivers/:id",getDriverById)
 router.patch("/drivers/:id/status",statusDriver)
 router.post("/auth/register",register)
