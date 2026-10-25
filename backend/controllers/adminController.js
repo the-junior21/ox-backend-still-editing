@@ -70,7 +70,7 @@ export const getRejectedDrivers = async (req, res) => {
 export const statusDriver = async (req, res) => {
     try{
                 console.log("STATUS ROUTE HIT");
-
+//iam the best ever most
         const {status,reason} = req.body
         if(!["approved","rejected"].includes(status)){
             return res.status(400).json({
