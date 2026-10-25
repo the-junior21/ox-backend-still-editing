@@ -39,7 +39,11 @@ const driverSchema = new mongoose.Schema(
 
       default: "pending",
     },
-    reason:String,
+rejectionReason: {
+  type: String,
+  trim: true,
+  default: null,
+},
   },
   {
     timestamps: true,

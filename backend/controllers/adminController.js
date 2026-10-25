@@ -77,13 +77,24 @@ export const statusDriver = async (req, res) => {
                 success:false,
             message:"invalid status",
             })
-
         }
+if (status === "rejected" && !reason?.trim()) {
+  return res.status(400).json({
+    success: false,
+    message: "A rejection reason is required",
+  });
+}
+const update = {
+  status,
+  rejectionReason:
+    status === "rejected" ? reason.trim() : null,
+};
         const driver = await Driver.findByIdAndUpdate(
             req.params.id,
-            { status},
-            { new: true }
-        );await User.findByIdAndUpdate(driver.user, {
+  update,
+  { new: true, runValidators: true }
+        );
+        await User.findByIdAndUpdate(driver.user, {
   driverStatus: status,
 });
         if (!driver) {
@@ -104,6 +115,22 @@ export const statusDriver = async (req, res) => {
         })
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
