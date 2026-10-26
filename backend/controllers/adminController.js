@@ -52,7 +52,7 @@ export const getRejectedDrivers = async (req, res) => {
       status: "rejected",
     })
       .select(
-        "firstName lastName vehicle vehicleBrand vehicleModel productionYear plateNumber vehicleColor image status createdAt"
+        "firstName lastName vehicle vehicleBrand vehicleModel productionYear plateNumber vehicleColor image status createdAt rejectionReason"
       )
       .populate("user", "email number");
 
