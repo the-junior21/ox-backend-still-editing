@@ -39,7 +39,7 @@ export const addOffers = async (req, res) => {
       });
     }
 
-    await Offer.create({
+    await Offers.create({
       title,
       image,
       active,
