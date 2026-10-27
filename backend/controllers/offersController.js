@@ -30,7 +30,7 @@ export const addOffers = async (req, res) => {
       });
     }
 
-    const existingOffer = await Offer.findOne({ title });
+    const existingOffer = await Offers.findOne({ title });
 
     if (existingOffer) {
       return res.status(400).json({
