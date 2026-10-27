@@ -44,8 +44,6 @@ export const getApprovedDrivers = async (req,res)=>{
 
     }
 }
-
-
 export const getRejectedDrivers = async (req, res) => {
   try {
     const drivers = await Driver.find({
@@ -115,6 +113,7 @@ const update = {
         })
     }
 }
+
 
 
 
