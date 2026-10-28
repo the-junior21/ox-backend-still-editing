@@ -60,4 +60,34 @@ export const addOffers = async (req, res) => {
     });
   }
 };
+export const updateOffers = async (req, res) => {
+  try {
+    const { title, image, link, active, order } = req.body;
+
+    const offer = await Offers.findByIdAndUpdate(
+      req.params.id,
+      { title, image, link, active, order },
+      { new: true, runValidators: true }
+    );
+
+    if (!offer) {
+      return res.status(404).json({
+        success: false,
+        message: "Offer not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Offer updated successfully",
+      offer,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
 
