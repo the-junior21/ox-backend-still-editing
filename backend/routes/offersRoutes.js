@@ -6,6 +6,6 @@ const router = express.Router();
 router.get("/", getOffers);
 router.post("/addOffers",addOffers)
 router.patch("/updateOffers/:id",updateOffers)
-router.delete("/deletOffers/:id",deleteOffers)
+router.delete("/deleteOffers/:id",deleteOffers)
 
 export default router;
