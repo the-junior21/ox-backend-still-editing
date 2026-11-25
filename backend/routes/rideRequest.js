@@ -241,7 +241,7 @@ notifyPassenger(ride, "ride_accepted")
     });
   }
 });
-router.patch("/:id/arrived",authenticateToken async (req, res) => {
+router.patch("/:id/arrived",authenticateToken, async (req, res) => {
   try {
     const ride = await Ride.findOneAndUpdate(
       {
