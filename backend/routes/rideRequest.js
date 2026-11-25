@@ -4,7 +4,7 @@ import Ride from "../models/rideSchema.js";
 import User from "../models/User.js";
 import authenticateToken from "../middleware/auth.js";
 
-import { io, onlineDrivers ,onlinePassngers} from "../server.js";
+import { io, onlineDrivers ,onlinePassengers} from "../server.js";
 
 const router = express.Router();
 
