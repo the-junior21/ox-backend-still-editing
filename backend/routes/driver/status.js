@@ -1,12 +1,14 @@
 import express from "express";
 import mongoose from "mongoose";
 import User from "../../models/User.js";
+import authenticateToken from "../../middleware/auth.js"
 
 const router = express.Router();
 
-router.patch("/status", async (req, res) => {
+router.patch("/status",authenticateToken,async (req, res) => {
   try {
-    const { userId, isOnline } = req.body;
+    const userId = req.user.id
+    const  {isOnline}  = req.body;
 console.log("Request body:", req.body);
 
     // Validate input
@@ -43,9 +45,10 @@ console.log("Request body:", req.body);
     return res.status(500).json({ message: "Server error" });
   }
 });
-router.patch("/availabilityStatus", async (req, res) => {
+router.patch("/availabilityStatus",authenticateToken, async (req, res) => {
   try {
-    const { userId, status } = req.body;
+    const userId = req.user.id
+    const  {status}  = req.body;
     const allowedStatuses = ["OFF_TRIP", "ON_TRIP"];
 
 console.log("Request body:", req.body);
@@ -88,7 +91,7 @@ if (!allowedStatuses.includes(status)) {
     return res.status(500).json({ message: "Server error" });
   }
 });
-router.get("/status/:userId", async (req, res) => {
+router.get("/status",authenticateToken, async (req, res) => {
   try {
     const { userId } = req.params;
 

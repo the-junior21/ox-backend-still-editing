@@ -1,5 +1,6 @@
 import adminRoutes from "./routes/adminRoutes.js"
 import express from "express";
+import jwt from "jsonwebtoken"
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -71,15 +72,27 @@ const io = new Server(httpServer, {
 const onlineDrivers = new Map();
 const onlinePassengers = new Map();
 
+io.use((socket, next) => {
+  try {
+    const token = socket.handshake.auth.token;
+    if (!token) return next(new Error("Authentication required"));
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    socket.userId = decoded.id;
+    next();
+  } catch (err) {
+    next(new Error("invalid token"));
+  }
+});
 io.on("connection", (socket) => {
   console.log("A user connected: ", socket.id);
 // wherever your socket connection handler lives
-socket.on("update_location", async ({ driverId, lat, lng }) => {
+socket.on("update_location", async ({ lat, lng }) => {
   if (typeof lat !== "number" || typeof lng !== "number") return;
-
-  await User.findByIdAndUpdate(driverId, {
-    location: { lat, lng, updatedAt: new Date() },
-  });
+  try {
+    await User.findByIdAndUpdate(socket.userId, {
+      location: { lat, lng, updatedAt: new Date() },
+    });
+  } catch (e) { console.log(e); }
 });
   socket.on("accept_ride", async ({ driverId, rideId }) => {
     try {
@@ -219,7 +232,6 @@ socket.on("update_location", async ({ driverId, lat, lng }) => {
       ([id, sId]) => sId === socket.id && onlinePassengers.delete(id),
     );
   });
-  
 });
 app.use(express.json());
 app.use("/api/places", placesRouter);

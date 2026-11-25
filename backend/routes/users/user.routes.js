@@ -1,5 +1,6 @@
 import express from "express"
 import User from "../../models/User.js"
+import authenticateToken "../middleware/auth.js"
  const router = express.Router()
  router.get("/:id",async(req,res)=>{
     try{
@@ -12,9 +13,10 @@ import User from "../../models/User.js"
         res.status(500).json({message:"server error"})
     }
  })
- router.patch("/pin", async (req, res) => {
+ router.patch("/pin",authenticateToken, async (req, res) => {
   try {
-    const { pin,userId } = req.body;
+    const userId = req.user.id
+    const  {pin} = req.body;
 
     if (pin !== null && !/^\d{4}$/.test(pin)) {
       return res.status(400).json({ message: "Invalid PIN format" });
@@ -37,9 +39,10 @@ import User from "../../models/User.js"
     res.status(500).json({ message: "Server error" });
   }
 });
-router.patch("/emergency-contacts", async (req, res) => {
+router.patch("/emergency-contacts",authenticateToken, async (req, res) => {
   try {
-    const { userId, contacts } = req.body;
+    userId = req.user.id
+    const  contacts  = req.body;
 
     if (!userId) {
       return res.status(400).json({ message: "userId is required" });
@@ -75,7 +78,7 @@ router.patch("/emergency-contacts", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-router.get("/get/pin/:id", async (req, res) => {
+router.get("/get/pin",authenticateToken, async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("pin");
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -84,7 +87,7 @@ router.get("/get/pin/:id", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-router.get("/get/emergency-contacts/:id", async (req, res) => {
+router.get("/get/emergency-contacts",authenticateToken, async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("emergencyContacts");
 

@@ -2,7 +2,9 @@ import express from "express";
 import fetch from "node-fetch";
 import Ride from "../models/rideSchema.js";
 import User from "../models/User.js";
-import { io, onlineDrivers } from "../server.js";
+import authenticateToken from "../middleware/auth.js";
+
+import { io, onlineDrivers ,onlinePassngers} from "../server.js";
 
 const router = express.Router();
 
@@ -52,10 +54,10 @@ function isValidLocation(loc) {
 }
 
 // POST /api/rides
-router.post("/", async (req, res) => {
+router.post("/",authenticateToken, async (req, res) => {
   try {
+    const passengerId = req.user.id
     const {
-      passengerId,
       pickup,
       destination,
       stops = [],
@@ -164,7 +166,7 @@ const socketId = onlineDrivers.get(driver._id.toString());
 // GET /api/rides/:id
 router.get("/:id", async (req, res) => {
   try {
-    const ride = await Ride.findById(req.params.id).populate("driverId", "name phoneNumber");
+    const ride = await Ride.findById(req.params.id).populate("driverId", "name number");
 
     if (!ride) {
       return res.status(404).json({ message: "Ride not found" });
@@ -186,8 +188,11 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-
-router.patch("/:id/accept", async (req, res) => {
+const notifyPassenger = (ride, event) => {
+  const sid = onlinePassengers.get(ride.passengerId.toString());
+  if (sid) io.to(sid).emit(event, { rideId: ride._id });
+};
+router.patch("/:id/accept",authenticateToken, async (req, res) => {
   try {
     const ride = await Ride.findOneAndUpdate(
       {
@@ -196,7 +201,7 @@ router.patch("/:id/accept", async (req, res) => {
         driverId: null,
       },
       {
-        driverId: req.body.driverId,
+        driverId: req.user.id,
         status: "ACCEPTED",
       },
       {
@@ -209,7 +214,20 @@ router.patch("/:id/accept", async (req, res) => {
         message: "Ride is no longer available",
       });
     }
-
+  await User.findByIdAndUpdate(driverId, { status: "ON_TRIP" });
+    const [passenger, driver] = await Promise.all([
+      User.findById(ride.passengerId),
+      User.findById(driverId),
+    ]);
+notifyPassenger(ride, "ride_accepted")
+    const sid = onlinePassengers.get(ride.passengerId.toString());
+    if (sid) {
+      io.to(sid).emit("ride_accepted", {
+        rideId: ride._id,
+        driverId,
+        driverPhone: driver?.number,
+      });
+    }
     return res.status(200).json({
       message: "Ride accepted successfully",
       ride,
@@ -223,13 +241,13 @@ router.patch("/:id/accept", async (req, res) => {
     });
   }
 });
-router.patch("/:id/arrived", async (req, res) => {
+router.patch("/:id/arrived",authenticateToken async (req, res) => {
   try {
     const ride = await Ride.findOneAndUpdate(
       {
         _id: req.params.id,
         status: "ACCEPTED",
-        driverId: req.body.driverId,
+        driverId: req.user.id,
       },
       {
         status: "ARRIVED",
@@ -244,6 +262,7 @@ router.patch("/:id/arrived", async (req, res) => {
         message: "Ride is no longer available or not assigned to this driver",
       });
     }
+    notifyPassenger(ride, "ride_arrived")
 
     return res.status(200).json({
       message: "driver arrived successfully",
@@ -258,13 +277,13 @@ router.patch("/:id/arrived", async (req, res) => {
     });
   }
 });
-router.patch("/:id/start", async (req, res) => {
+router.patch("/:id/start", authenticateToken,async (req, res) => {
   try {
     const ride = await Ride.findOneAndUpdate(
       {
         _id: req.params.id,
         status: "ARRIVED",
-        driverId: req.body.driverId,
+        driverId: req.user.id,
       },
       {
         status: "ONGOING",
@@ -279,9 +298,10 @@ router.patch("/:id/start", async (req, res) => {
         message: "Ride is no longer available or not assigned to this driver",
       });
     }
+    notifyPassenger(ride, "ride_started")
 
     return res.status(200).json({
-      message: "driver arrived successfully",
+      message: "driver started successfully",
       ride,
     });
 
@@ -293,13 +313,13 @@ router.patch("/:id/start", async (req, res) => {
     });
   }
 });
-router.patch("/:id/completed", async (req, res) => {
+router.patch("/:id/completed",authenticateToken, async (req, res) => {
   try {
     const ride = await Ride.findOneAndUpdate(
       {
         _id: req.params.id,
         status: "ONGOING",
-        driverId: req.body.driverId,
+        driverId: req.user.id,
       },
       {
         status: "COMPLETED",
@@ -315,9 +335,10 @@ router.patch("/:id/completed", async (req, res) => {
         message: "Ride is no longer available or not assigned to this driver",
       });
     }
-          await User.findByIdAndUpdate(req.body.driverId, {
+          await User.findByIdAndUpdate(req.user.id, {
             status: "OFF_TRIP",
           });
+          notifyPassenger(ride, "ride_completed")
     return res.status(200).json({
       message: "RIDE completed successfully",
       ride,
@@ -331,42 +352,29 @@ router.patch("/:id/completed", async (req, res) => {
     });
   }
 });
-router.patch("/:id/passengerCancellation", async (req, res) => {
+router.patch("/:id/passengerCancellation", authenticateToken,async (req, res) => {
   try {
     const ride = await Ride.findOneAndUpdate(
 
 {
-    _id: req.params.id,
-
-    $or: [
-      {
-        status: "SEARCHING",
-        driverId: null,
+        _id: req.params.id,
+        passengerId: req.user.id,
+        status: { $in: ["SEARCHING", "ACCEPTED", "ARRIVED", "ONGOING"] },
       },
-      {
-        status: {
-          $in: ["ACCEPTED", "ARRIVED","ONGOING"],
-        },
-        driverId: req.body.driverId,
-      },
-    ],
-  },
-{
-    status: "CANCELLED",
-    cancelledBy: "PASSENGER",
-    cancelledAt: new Date(),
-  },
-{
-    new: true,
-  })
+ { status: "CANCELLED", cancelledBy: "PASSENGER", cancelledAt: new Date() },
+      { new: true },
+    
+    )
     if (!ride) {
       return res.status(409).json({
         message: "Ride is no longer available or not assigned to this driver",
       });
     }
-    await User.findByIdAndUpdate(req.body.driverId, {
-            status: "OFF_TRIP",
-          });
+    if (ride.driverId) {
+      await User.findByIdAndUpdate(ride.driverId, { status: "OFF_TRIP" });
+      const sid = onlineDrivers.get(ride.driverId.toString());
+      if (sid) io.to(sid).emit("ride_cancelled", { rideId: ride._id });
+    }
     return res.status(200).json({
       message: "RIDE cancelled successfully",
       ride,
@@ -380,7 +388,7 @@ router.patch("/:id/passengerCancellation", async (req, res) => {
     });
   }
 });
-router.patch("/:id/driverCancellation", async (req, res) => {
+router.patch("/:id/driverCancellation", authenticateToken,async (req, res) => {
   try {
     const ride = await Ride.findOneAndUpdate(
       {
@@ -389,7 +397,7 @@ router.patch("/:id/driverCancellation", async (req, res) => {
           $in:  ["ACCEPTED" , "ARRIVED" , "ONGOING"],
           
         },
-        driverId: req.body.driverId,
+        driverId: req.user.id,
       },
       {
         status: "CANCELLED",
@@ -405,9 +413,10 @@ router.patch("/:id/driverCancellation", async (req, res) => {
         message: "Ride is no longer available or not assigned to this driver",
       });
     }
-          await User.findByIdAndUpdate(req.body.driverId, {
+          await User.findByIdAndUpdate(req.user.id, {
             status: "OFF_TRIP",
           });
+          notifyPassenger(ride, "ride_cancelled")
     return res.status(200).json({
       message: "RIDE cancelled successfully",
       ride,
