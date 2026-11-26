@@ -194,6 +194,7 @@ const notifyPassenger = (ride, event) => {
 };
 router.patch("/:id/accept",authenticateToken, async (req, res) => {
   try {
+    const driverId = req.user.id
     const ride = await Ride.findOneAndUpdate(
       {
         _id: req.params.id,
@@ -201,7 +202,7 @@ router.patch("/:id/accept",authenticateToken, async (req, res) => {
         driverId: null,
       },
       {
-        driverId: req.user.id,
+        driverId,
         status: "ACCEPTED",
       },
       {
