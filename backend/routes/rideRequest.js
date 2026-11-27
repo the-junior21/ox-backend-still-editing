@@ -195,6 +195,7 @@ const notifyPassenger = (ride, event) => {
 router.patch("/:id/accept",authenticateToken, async (req, res) => {
   try {
     const driverId = req.user.id
+
     const ride = await Ride.findOneAndUpdate(
       {
         _id: req.params.id,
@@ -215,6 +216,7 @@ router.patch("/:id/accept",authenticateToken, async (req, res) => {
         message: "Ride is no longer available",
       });
     }
+    
   await User.findByIdAndUpdate(driverId, { status: "ON_TRIP" });
     const [passenger, driver] = await Promise.all([
       User.findById(ride.passengerId),
@@ -232,6 +234,8 @@ notifyPassenger(ride, "ride_accepted")
     return res.status(200).json({
       message: "Ride accepted successfully",
       ride,
+        passengerPhone: passenger?.number ?? null,
+
     });
 
   } catch (error) {
