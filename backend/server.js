@@ -167,18 +167,18 @@ socket.on("update_location", async ({ lat, lng }) => {
     onlinePassengers.set(passengerId, socket.id);
     console.log("Passenger registered:", passengerId);
   });
-  socket.on("driver_online", (driverId) => {
+  socket.on("driver_online", () => {
     onlineDrivers.set(driverId, socket.id);
-    console.log("✅ Driver ONLINE:", driverId, socket.id);
+    console.log("✅ Driver ONLINE:", socket.userId, socket.id);
   });
-  socket.on("driver_offline", (driverId) => {
-  onlineDrivers.delete(driverId);
+  socket.on("driver_offline", () => {
+  onlineDrivers.delete(socket.userId);
 
-  console.log("❌ Driver OFFLINE:", driverId);
+  console.log("❌ Driver OFFLINE:", socket.userId);
 });
-  socket.on("passenger_online", (passengerId) => {
-    onlinePassengers.set(passengerId, socket.id);
-    console.log("✅ passenger ONLINE:", passengerId, socket.id);
+  socket.on("passenger_online", () => {
+    onlinePassengers.set(socket.userId, socket.id);
+    console.log("✅ passenger ONLINE:", socket.userId, socket.id);
   });
   socket.on("ride_completed",async({driverId,rideId}) =>{
     try{
