@@ -8,26 +8,6 @@ import { io, onlineDrivers ,onlinePassengers} from "../server.js";
 
 const router = express.Router();
 
-async function sendPushNotification(expoPushToken, title, body, data = {}) {
-  try {
-    await fetch("https://exp.host/--/api/v2/push/send", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        to: expoPushToken,
-        sound: "default",
-        title,
-        body,
-        data,
-      }),
-    });
-  } catch (err) {
-    console.log("error push notification ", err);
-  }
-}
 
 function getDistanceKm(lat1, lng1, lat2, lng2) {
   const R = 6371;
@@ -127,7 +107,8 @@ router.post("/",authenticateToken, async (req, res) => {
       .sort((a, b) => a.distance - b.distance)
       .slice(0, MAX_DRIVERS_NOTIFIED)
       .map((d) => d.driver);
-
+console.log("drivers:", drivers.length, "nearby:", nearbyDrivers.length,
+  "sockets:", nearbyDrivers.map(d => onlineDrivers.get(d._id.toString())));
     nearbyDrivers.forEach((driver) => {
 const socketId = onlineDrivers.get(driver._id.toString());
       if (socketId) {
@@ -142,14 +123,7 @@ const socketId = onlineDrivers.get(driver._id.toString());
           price,
         });
       }
-      if (driver.pushToken) {
-        sendPushNotification(
-          driver.pushToken,
-          "New Ride Request",
-          `Pickup at ${pickup.address}, destination ${destination.address}`,
-          { rideId: ride._id },
-        );
-      }
+ 
     });
 
     res.status(201).json({
@@ -222,7 +196,6 @@ router.patch("/:id/accept",authenticateToken, async (req, res) => {
       User.findById(ride.passengerId),
       User.findById(driverId),
     ]);
-notifyPassenger(ride, "ride_accepted")
     const sid = onlinePassengers.get(ride.passengerId.toString());
     if (sid) {
       io.to(sid).emit("ride_accepted", {
